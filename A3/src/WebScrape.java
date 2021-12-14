@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class WebScrape {
+public class WebScrape extends Graph{
 
     public static void main(String[] args) {
 
@@ -58,19 +58,62 @@ public class WebScrape {
                     artistsFinal.addAll(Arrays.asList(artistArray));
                 }
 
-
                 String delimiter = "[(•(] (.*?) [(]";
                 pattern = Pattern.compile(delimiter);
 
                 ArrayList<String> artistsOnly = new ArrayList<>();
-                for (String item :
-                        artistsFinal) {
+                for (String item : artistsFinal) {
                     Matcher matcher = pattern.matcher(item);
                     if(matcher.find()){
                         artistsOnly.add(matcher.group(1));
                     }
                 }
-                System.out.println(artistsOnly);
+                //System.out.println(artistsOnly);
+
+
+                //Make a new graph
+                Graph graph = new Graph();
+
+                //Problems with this part: There are a lot of different variations in the data set,
+                //some contain featuring, some contain Featuring, &amp;, commas, and some contain one
+                //or more of each delimiter. Code needs to chop down the string using all different variations
+                //and then add each as a vertex if the vertex doesn't exist, and then link each function
+                //using the addEdge function.
+
+                for (String name : artistsOnly) {
+                    //If line has multiple artists, split them up and add them as separate nodes
+                    if(name.contains("Featuring")){
+                        //Splits out all the artists using "Featuring" delimiter, add each artist as a new
+                        //vertex in the graph if it doesn't already exist, and then link each one of
+                        //them together using addEdge function.
+
+//                        String [] singleArtistFirst = name.split("Featuring");
+//
+//                        for (String artistDraft : singleArtistFirst) {
+//                            if(artistDraft.contains("&amp;")){
+//                                String [] singleArtistSecond = name.split("&amp;");
+//
+//                                for (String item : singleArtistSecond) {
+//                                    System.out.println(item);
+//                                    if(!graph.artistIndex.contains(item)){
+//                                        graph.addVertex(item);
+//                                    }
+//                                }
+//                            }
+//                        }
+                    }
+                    else if(name.contains("&amp;")){
+                        //Splits out all the artists using &amp delimiter, add each artist as a new
+                        //vertex in the graph if it doesn't already exist, and then link each one of
+                        //them together using addEdge function.
+                    }
+                    else{
+                        if(!graph.artistIndex.contains(name)){
+                            graph.addVertex(name);
+                        }
+                    }
+
+                }
 
             }
             catch(Exception ex){

@@ -5,7 +5,7 @@ import java.util.LinkedList;
 public class Graph <T> {
 
     private int artistCount = 0;
-    protected ArrayList<LinkedList<String>> adjacencyList;
+    protected ArrayList<LinkedList<String>> adjacencyList = new ArrayList<>();
     protected Hashtable<String, Integer> artistIndex = new Hashtable<>();
 
 
@@ -40,10 +40,6 @@ public class Graph <T> {
     public LinkedList<String> collaborations(String artist){
         return adjacencyList.get(artistIndex.get(artist));
     }
-
-
-
-
 
 }
 
