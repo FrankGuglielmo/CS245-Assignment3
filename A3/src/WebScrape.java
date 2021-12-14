@@ -3,6 +3,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -10,7 +11,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class WebScrape {
-
 
     public static void main(String[] args) {
 
@@ -43,12 +43,40 @@ public class WebScrape {
                         //System.out.println(secondDraftLines.get(j));
                     }
                 }
+
+                ArrayList<String> artists = new ArrayList<>();
+                for (int j = 0; j < finalLines.size(); j++) {
+
+                    String line = finalLines.get(j).replace("–", "(");
+                    String [] artistArray = line.split("<br>");
+                    artists.addAll(Arrays.asList(artistArray));
+                }
+
+                ArrayList<String> artistsFinal = new ArrayList<>();
+                for (int j = 0; j < artists.size(); j++) {
+                    String [] artistArray = artists.get(j).split("<p>");
+                    artistsFinal.addAll(Arrays.asList(artistArray));
+                }
+
+
+                String delimiter = "[(•(] (.*?) [(]";
+                pattern = Pattern.compile(delimiter);
+
+                ArrayList<String> artistsOnly = new ArrayList<>();
+                for (String item :
+                        artistsFinal) {
+                    Matcher matcher = pattern.matcher(item);
+                    if(matcher.find()){
+                        artistsOnly.add(matcher.group(1));
+                    }
+                }
+                System.out.println(artistsOnly);
+
             }
             catch(Exception ex){
                 ex.printStackTrace();
             }
         }
-
 
 
     }
