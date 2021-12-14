@@ -9,6 +9,30 @@ public class Graph <T> {
     protected Hashtable<String, Integer> artistIndex = new Hashtable<>();
 
 
+    public int getArtistCount(){
+        return artistCount;
+    }
+
+
+
+    public void handleAddingArtists(ArrayList<String> artistNames){
+        //Make all the names in artistNames vertexes if not already
+        for (String artist : artistNames) {
+            if (!artistIndex.contains(artist)) {
+                addVertex(artist);
+            }
+        }
+        //add them as edges
+        for (String artist : artistNames) {
+            //Adds connections between all artists in line
+            for (String subArtists : artistNames) {
+                if(!subArtists.equals(artist)){
+                    addEdge(artist, subArtists);
+                }
+            }
+        }
+    }
+
     public void addVertex(String name){
         //Make a new LinkedList to go in the ArrayList
         LinkedList<String> newArtist = new LinkedList<>();

@@ -6,16 +6,46 @@ import org.jsoup.select.Elements;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class WebScrape extends Graph{
 
+
+//    public void bfs (int source) throws Exception {
+//        boolean [] visited = new boolean[getArtistCount() + 1];
+//        bfs(source, visited);
+//    }
+//    void bfs(int v, boolean [] visited) throws Exception {
+//        LinkedQueue q = new LinkedQueue();
+//        visited[v] =  true;
+//        q.enqueue(v);
+//        while(!q.empty())
+//            v = (int) q.dequeue();
+//        for (String adj : collaborations(v))
+//            if(!visited[adj]) {
+//                q.enqueue(adj);
+//                visited[adj] =  true;
+//            }   }
+
+
+    public ArrayList<String> allCollaborations(Graph artistWeb, String artist){
+
+        LinkedList result = artistWeb.collaborations(artist);
+        ArrayList<String> allConnections = new ArrayList<String>(result);
+
+        return allConnections;
+    }
+
+
+
     public static void main(String[] args) {
 
+        Graph graph = new Graph();
 
-        for (int i = 1990; i < 1991; i++) {
+        for (int i = 2019; i < 2020; i++) {
             try{
                 //Prepare the year for when we connect to URL
                 String year = String.valueOf(i);
@@ -72,7 +102,6 @@ public class WebScrape extends Graph{
 
 
                 //Make a new graph
-                Graph graph = new Graph();
 
                 //Problems with this part: There are a lot of different variations in the data set,
                 //some contain featuring, some contain Featuring, &amp;, commas, and some contain one
@@ -80,46 +109,118 @@ public class WebScrape extends Graph{
                 //and then add each as a vertex if the vertex doesn't exist, and then link each function
                 //using the addEdge function.
 
+                ArrayList<String> artistNames = new ArrayList<>();
+
                 for (String name : artistsOnly) {
-                    //If line has multiple artists, split them up and add them as separate nodes
-                    if(name.contains("Featuring")){
-                        //Splits out all the artists using "Featuring" delimiter, add each artist as a new
-                        //vertex in the graph if it doesn't already exist, and then link each one of
-                        //them together using addEdge function.
-
-//                        String [] singleArtistFirst = name.split("Featuring");
-//
-//                        for (String artistDraft : singleArtistFirst) {
-//                            if(artistDraft.contains("&amp;")){
-//                                String [] singleArtistSecond = name.split("&amp;");
-//
-//                                for (String item : singleArtistSecond) {
-//                                    System.out.println(item);
-//                                    if(!graph.artistIndex.contains(item)){
-//                                        graph.addVertex(item);
-//                                    }
-//                                }
-//                            }
-//                        }
+                //If the line has featuring and an &
+                if(name.contains("Featuring") && name.contains("&amp;")){
+                    //cleanup
+                    String [] line = name.split("Featuring");
+                    for (String dirtyName : line) {
+                        String clean = dirtyName.strip();
+                        artistNames.add(clean);
                     }
-                    else if(name.contains("&amp;")){
-                        //Splits out all the artists using &amp delimiter, add each artist as a new
-                        //vertex in the graph if it doesn't already exist, and then link each one of
-                        //them together using addEdge function.
-                    }
-                    else{
-                        if(!graph.artistIndex.contains(name)){
-                            graph.addVertex(name);
+                    ArrayList<String> cleanestNames = new ArrayList<>();
+                    for (String cleanestName: artistNames) {
+                        if(cleanestName.contains("&amp;")){
+                            String [] line2 = cleanestName.split("&amp;");
+                            for (String doubleArtist : line2) {
+                                String clean2 = doubleArtist.strip();
+                                cleanestNames.add(clean2);
+                            }
                         }
+                        else{
+                            cleanestNames.add(cleanestName);
+                        }
+
                     }
-
+                    //Call handleAddingArtists
+                    //Check to see if each artist is in graph or not, if not, add them
+                    //connect each artist to each other with addEdge
+                    graph.handleAddingArtists(cleanestNames);
                 }
+                else if(name.contains("featuring") && name.contains("&amp;")){
+                    //cleanup
+                    String [] line = name.split("featuring");
+                    for (String dirtyName : line) {
+                        String clean = dirtyName.strip();
+                        artistNames.add(clean);
+                    }
+                    ArrayList<String> cleanestNames = new ArrayList<>();
+                    for (String cleanestName: artistNames) {
+                        if(cleanestName.contains("&amp;")){
+                            String [] line2 = cleanestName.split("&amp;");
+                            for (String doubleArtist : line2) {
+                                String clean2 = doubleArtist.strip();
+                                cleanestNames.add(clean2);
+                            }
+                        }
+                        else{
+                            cleanestNames.add(cleanestName);
+                        }
 
+                    }
+                    //Call handleAddingArtists
+                    //Check to see if each artist is in graph or not, if not, add them
+                    //connect each artist to each other with addEdge
+                    graph.handleAddingArtists(cleanestNames);
+                    }
+                //If line contains a feature
+                else if(name.contains("Featuring")){
+                    //cleanup
+                    String [] line = name.split("Featuring");
+                    for (String dirtyName : line) {
+                        String clean = dirtyName.strip();
+                        artistNames.add(clean);
+                    }
+                    //Call handleAddingArtists
+                        //Check to see if each artist is in graph or not, if not, add them
+                        //connect each artist to each other with addEdge
+                    graph.handleAddingArtists(artistNames);
+                }
+                else if(name.contains("featuring")) {
+                    //cleanup
+                    String [] line = name.split("featuring");
+                    for (String dirtyName : line) {
+                        String clean = dirtyName.strip();
+                        artistNames.add(clean);
+                    }
+                    //Call handleAddingArtists
+                    //Check to see if each artist is in graph or not, if not, add them
+                    //connect each artist to each other with addEdge
+                    graph.handleAddingArtists(artistNames);
+                }
+                //If line contains an &
+                else if(name.contains("&amp;")){
+                    //cleanup
+                    String [] line = name.split("&amp;");
+                    for (String dirtyName : line) {
+                        String clean = dirtyName.strip();
+                        artistNames.add(clean);
+                    }
+                    //Call handleAddingArtists
+                    //Check to see if each artist is in graph or not, if not, add them
+                    //connect each artist to each other with addEdge
+                    graph.handleAddingArtists(artistNames);
+                }
+                //Line just contains one artist
+                else{
+                    //no cleanup
+                    if(!graph.artistIndex.contains(name)){
+                        graph.addVertex(name);
+                    }
+                }
+                }
             }
             catch(Exception ex){
                 ex.printStackTrace();
             }
         }
+
+
+        WebScrape webscrape = new WebScrape();
+        System.out.println(webscrape.allCollaborations(graph, "Justin Bieber"));
+
 
 
     }
