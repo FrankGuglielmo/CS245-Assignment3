@@ -4,32 +4,13 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class WebScrape extends Graph{
 
-
-//    public void bfs (int source) throws Exception {
-//        boolean [] visited = new boolean[getArtistCount() + 1];
-//        bfs(source, visited);
-//    }
-//    void bfs(int v, boolean [] visited) throws Exception {
-//        LinkedQueue q = new LinkedQueue();
-//        visited[v] =  true;
-//        q.enqueue(v);
-//        while(!q.empty())
-//            v = (int) q.dequeue();
-//        for (String adj : collaborations(v))
-//            if(!visited[adj]) {
-//                q.enqueue(adj);
-//                visited[adj] =  true;
-//            }   }
-
+    public ArrayList<String> artistOfArtists = new ArrayList<>();
 
     public ArrayList<String> allCollaborations(Graph artistWeb, String artist){
 
@@ -39,13 +20,24 @@ public class WebScrape extends Graph{
         return allConnections;
     }
 
+    //Tried to recursively find all the features of each feature for a given artist
+    public void recursiveCollaborations(Graph graph, String artist){
+        //Base Case
+        ArrayList<String> singleCollaborations = allCollaborations(graph, artist);
+        //Recursive Case
+        for (String subArtist: singleCollaborations) {
+            artistOfArtists.add(subArtist);
+            recursiveCollaborations(graph, subArtist);
+        }
+
+    }
 
 
     public static void main(String[] args) {
 
         Graph graph = new Graph();
 
-        for (int i = 2019; i < 2020; i++) {
+        for (int i = 2012; i < 2013; i++) {
             try{
                 //Prepare the year for when we connect to URL
                 String year = String.valueOf(i);
@@ -109,6 +101,7 @@ public class WebScrape extends Graph{
                 //and then add each as a vertex if the vertex doesn't exist, and then link each function
                 //using the addEdge function.
 
+
                 ArrayList<String> artistNames = new ArrayList<>();
 
                 for (String name : artistsOnly) {
@@ -139,6 +132,7 @@ public class WebScrape extends Graph{
                     //connect each artist to each other with addEdge
                     graph.handleAddingArtists(cleanestNames);
                 }
+
                 else if(name.contains("featuring") && name.contains("&amp;")){
                     //cleanup
                     String [] line = name.split("featuring");
@@ -169,39 +163,42 @@ public class WebScrape extends Graph{
                 else if(name.contains("Featuring")){
                     //cleanup
                     String [] line = name.split("Featuring");
+                    ArrayList<String> cleanestNames = new ArrayList<>();
                     for (String dirtyName : line) {
                         String clean = dirtyName.strip();
-                        artistNames.add(clean);
+                        cleanestNames.add(clean);
                     }
                     //Call handleAddingArtists
                         //Check to see if each artist is in graph or not, if not, add them
                         //connect each artist to each other with addEdge
-                    graph.handleAddingArtists(artistNames);
+                    graph.handleAddingArtists(cleanestNames);
                 }
                 else if(name.contains("featuring")) {
                     //cleanup
                     String [] line = name.split("featuring");
+                    ArrayList<String> cleanestNames = new ArrayList<>();
                     for (String dirtyName : line) {
                         String clean = dirtyName.strip();
-                        artistNames.add(clean);
+                        cleanestNames.add(clean);
                     }
                     //Call handleAddingArtists
                     //Check to see if each artist is in graph or not, if not, add them
                     //connect each artist to each other with addEdge
-                    graph.handleAddingArtists(artistNames);
+                    graph.handleAddingArtists(cleanestNames);
                 }
                 //If line contains an &
                 else if(name.contains("&amp;")){
                     //cleanup
                     String [] line = name.split("&amp;");
+                    ArrayList<String> cleanestNames = new ArrayList<>();
                     for (String dirtyName : line) {
                         String clean = dirtyName.strip();
-                        artistNames.add(clean);
+                        cleanestNames.add(clean);
                     }
                     //Call handleAddingArtists
                     //Check to see if each artist is in graph or not, if not, add them
                     //connect each artist to each other with addEdge
-                    graph.handleAddingArtists(artistNames);
+                    graph.handleAddingArtists(cleanestNames);
                 }
                 //Line just contains one artist
                 else{
@@ -210,6 +207,7 @@ public class WebScrape extends Graph{
                         graph.addVertex(name);
                     }
                 }
+
                 }
             }
             catch(Exception ex){
@@ -219,7 +217,14 @@ public class WebScrape extends Graph{
 
 
         WebScrape webscrape = new WebScrape();
-        System.out.println(webscrape.allCollaborations(graph, "Justin Bieber"));
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Find recommendations for artist: ");
+        String person = scanner.nextLine();
+        List condensedArtists = webscrape.allCollaborations(graph, person);
+        Set<String> set = new HashSet<>(condensedArtists);
+        ArrayList<String> endList = new ArrayList<>(set);
+
+        System.out.println(endList);
 
 
 

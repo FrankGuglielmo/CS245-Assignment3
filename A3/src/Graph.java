@@ -14,11 +14,15 @@ public class Graph <T> {
     }
 
 
+    public boolean checkConnection(String artist1, String artist2){
+        LinkedList<String> artistsAdjacencies = adjacencyList.get(artistIndex.get(artist1));
+        return artistsAdjacencies.contains(artist2);
+    }
 
     public void handleAddingArtists(ArrayList<String> artistNames){
         //Make all the names in artistNames vertexes if not already
         for (String artist : artistNames) {
-            if (!artistIndex.contains(artist)) {
+            if (!artistIndex.containsKey(artist)) {
                 addVertex(artist);
             }
         }
@@ -26,8 +30,30 @@ public class Graph <T> {
         for (String artist : artistNames) {
             //Adds connections between all artists in line
             for (String subArtists : artistNames) {
+                //Make sure artist and subArtists are not the same person
                 if(!subArtists.equals(artist)){
-                    addEdge(artist, subArtists);
+                    //Make sure there are no duplicate connections
+                    if(!checkConnection(artist, subArtists)){
+                        if(artistIndex.containsKey(artist)){
+                            if(artistIndex.containsKey(subArtists)){
+                                addEdge(artist, subArtists);
+                            }
+                            else {
+                                addVertex(subArtists);
+                                addEdge(artist, subArtists);
+                            }
+                        }
+                        else {
+                            addVertex(artist);
+                            if(artistIndex.containsKey(subArtists)){
+                                addEdge(artist, subArtists);
+                            }
+                            else {
+                                addVertex(subArtists);
+                                addEdge(artist, subArtists);
+                            }
+                        }
+                    }
                 }
             }
         }
